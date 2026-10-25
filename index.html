@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>农事天气节点提醒 · 简易观测轻台账 · 刘润</title>
+<meta name="description" content="中小种植户：关键农事天气风险节点提醒（霜冻/大风/连阴雨）+ 简易观测日记录。不做天气预报App，不卖硬件。"/>
+<style>
+:root{--ink:#1c3328;--muted:#5a6d62;--line:#cfe0d6;--bg:#eef6f1;--card:#fbfefb;--accent:#2f6b52;--accent2:#5a9a6a;--warn:#9a6b20;--soft:#e3f0e8}
+*{box-sizing:border-box}html{scroll-behavior:smooth}
+body{margin:0;font-family:"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;color:var(--ink);line-height:1.65;background:radial-gradient(900px 420px at 10% -10%,#cfe8d8,transparent 55%),radial-gradient(700px 360px at 100% 0,#dcefd8,transparent 48%),linear-gradient(180deg,#f3faf5 0%,var(--bg) 40%,#f7fbf8 100%)}
+.top{position:sticky;top:0;z-index:10;background:rgba(238,246,241,.94);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
+.top-in{max-width:920px;margin:0 auto;padding:10px 16px;display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:center}
+.brand{font-weight:800;letter-spacing:.02em}.nav a{margin-left:4px;text-decoration:none;color:var(--ink);font-size:13px;padding:6px 10px;border-radius:999px}
+.nav a:hover{background:#fff;border:1px solid var(--line)}
+.wrap{max-width:920px;margin:0 auto;padding:18px 16px 64px}
+.kicker{display:inline-block;font-size:12px;font-weight:700;color:var(--accent);background:var(--soft);border:1px solid #b9d6c0;border-radius:999px;padding:4px 10px;margin-bottom:10px}
+h1{margin:0 0 10px;font-size:clamp(28px,5vw,40px);line-height:1.2;color:var(--accent)}
+.lead{color:var(--muted);font-size:17px;max-width:44em}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}
+.chip{font-size:12px;background:#fff;border:1px solid var(--line);border-radius:999px;padding:4px 10px;color:var(--muted)}
+.cta{display:flex;flex-wrap:wrap;gap:10px;margin-top:12px}
+.btn{appearance:none;border:0;cursor:pointer;font:inherit;font-weight:700;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;padding:12px 16px;border-radius:12px}
+.btn-p{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff}.btn-g{background:#fff;color:var(--ink);border:1px solid var(--line)}.btn-block{width:100%}
+.warn{margin:16px 0;padding:14px 16px;border-radius:14px;background:#fff8ee;border:1px solid #efd3a8;border-left:6px solid var(--warn)}
+.warn h2{margin:0 0 6px;font-size:16px;color:var(--warn)}.warn ul{margin:0;padding-left:1.2em}.warn li{margin:4px 0}
+.grid{display:grid;gap:12px}@media(min-width:760px){.g2{grid-template-columns:1.05fr .95fr}.g3{grid-template-columns:repeat(3,1fr)}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;box-shadow:0 8px 24px rgba(28,51,40,.05)}
+.card h2{margin:0 0 8px;font-size:18px;color:var(--accent)}.card p,.card li{color:var(--muted)}
+.risk{padding:14px;border-radius:14px;background:#fff;border:1px dashed var(--line);text-align:left}
+.risk b{display:block;font-size:18px;color:var(--accent);margin-bottom:6px}
+.risk small{display:block;color:var(--muted);font-size:13px;line-height:1.5}
+.q{margin:0 0 10px;padding:10px 12px;background:var(--soft);border-left:3px solid var(--accent);border-radius:0 10px 10px 0}
+.q cite{display:block;margin-top:4px;font-style:normal;font-size:12px;color:var(--muted)}
+.steps{list-style:none;margin:0;padding:0;counter-reset:s}
+.steps li{position:relative;padding:10px 10px 10px 46px;border:1px solid var(--line);border-radius:12px;margin-bottom:8px;background:#fff;color:var(--muted)}
+.steps li::before{counter-increment:s;content:counter(s);position:absolute;left:10px;top:10px;width:26px;height:26px;border-radius:50%;background:var(--accent);color:#fff;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center}
+label.ck{display:flex;gap:10px;align-items:flex-start;padding:10px 12px;border:1px solid var(--line);border-radius:12px;margin:0 0 8px;background:#fff;cursor:pointer}
+label.ck input{margin-top:3px;width:18px;height:18px;accent-color:var(--accent)}
+label.ck:has(input:checked){border-color:#8fbc8f;background:#f4faf6}
+.field{margin:0 0 10px}.field>span{display:block;font-size:13px;font-weight:700;margin-bottom:4px;color:var(--ink)}
+.field input,.field select,.field textarea{width:100%;padding:10px 12px;border:1px solid var(--line);border-radius:10px;font:inherit;background:#fff}
+.field textarea{min-height:72px;resize:vertical}
+.row2{display:grid;gap:10px}@media(min-width:560px){.row2{grid-template-columns:1fr 1fr}}
+.bar{height:8px;background:#d7e8de;border-radius:999px;overflow:hidden;margin:6px 0 8px}.bar>i{display:block;height:100%;width:0;background:linear-gradient(90deg,#5a9a6a,var(--accent));transition:width .2s}
+.msg{min-height:1.3em;font-weight:700}.ok{color:#0b6b4a}.err{color:#8b2e1a}
+.item{border:1px dashed var(--line);border-radius:10px;padding:10px 12px;margin-bottom:8px;font-size:13px;background:#fff}.item b{display:block;margin-bottom:2px}
+.sec{margin-top:16px}footer{margin-top:22px;padding-top:12px;border-top:1px solid var(--line);color:var(--muted);font-size:12px}
+code{background:#fff;border:1px solid var(--line);border-radius:6px;padding:1px 6px;word-break:break-all}
+.tl{border-left:3px solid #8fbc8f;margin:8px 0 0 6px;padding-left:14px}.tl li{margin:0 0 10px;list-style:none;color:var(--muted)}
+.faq details{border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin:0 0 8px;background:#fff}
+.faq summary{cursor:pointer;font-weight:700;color:var(--ink)}.faq p{margin:8px 0 0;font-size:14px}
+.ex{display:grid;gap:8px;margin-top:8px}
+.ex div{padding:10px 12px;border-radius:10px;background:#fff;border:1px solid var(--line);font-size:13px;color:var(--muted)}
+.ex strong{color:var(--accent)}
+.hint{font-size:12px;color:var(--muted);margin:6px 0 0}
+.stats{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.stat{flex:1;min-width:120px;background:#fff;border:1px solid var(--line);border-radius:12px;padding:10px;text-align:center}
+.stat b{display:block;font-size:20px;color:var(--accent)}.stat span{font-size:12px;color:var(--muted)}
+</style>
+</head>
+<body>
+<header class="top"><div class="top-in"><div class="brand">农事天气 · 简易观测</div><nav class="nav"><a href="#why">依据</a><a href="#node">天气节点</a><a href="#obs">简易观测</a><a href="#book">预约试填</a><a href="#hist">本机记录</a></nav></div></header>
+<main class="wrap">
+<section>
+  <div class="kicker">沈阳农业大学 · 农学院 · 应用气象学 · 课程 MVP</div>
+  <h1>关键农事看天气，观测留一笔</h1>
+  <p class="lead">给中小<strong>种植户</strong>（主责人或协助记账的家属）：关键农事节点遇到<strong>霜冻 / 大风 / 连阴雨</strong>时先勾提醒，再留下简易观测。本页<strong>不做</strong>天气预报 App，<strong>不卖</strong>传感器和硬件，也不承诺精准降雨量。</p>
+  <div class="chips">
+    <span class="chip">刘润 · 2024111005</span>
+    <span class="chip">农事天气节点提醒·简易观测轻台账</span>
+    <span class="chip">路径 B · 绿色轻工具</span>
+    <span class="chip">记录仅存本机</span>
+  </div>
+  <div class="cta">
+    <a class="btn btn-p" href="#node">勾本周天气节点</a>
+    <a class="btn btn-g" href="#obs">记简易观测</a>
+    <a class="btn btn-g" href="#book">留下预约</a>
+  </div>
+</section>
+
+<section class="warn">
+  <h2>边界三句（请先看）</h2>
+  <ul>
+    <li>只做关键农事天气风险<strong>节点提醒</strong> + 霜冻/大风/连阴雨<strong>简易观测留痕</strong>。</li>
+    <li>不做官方预报、不做天气预报 App、不承诺精准预报、不卖硬件与传感器。</li>
+    <li>记录只存在这台设备浏览器里；官方预警仍看气象台发布。经销商催促只作勾选提醒，不代表代购或推销。</li>
+  </ul>
+</section>
+
+<section class="sec grid g3">
+  <div class="risk"><b>霜冻</b><small>关键节点前勾一眼：播栽、覆膜、幼苗期等是否碰上低温风险日，事后能对上「哪天冷」。</small></div>
+  <div class="risk"><b>大风</b><small>支架、覆膜、搭棚相关农事别靠口头催；勾过就能和家里人对上。</small></div>
+  <div class="risk"><b>连阴雨</b><small>排湿、田间作业窗口写清；只记肉眼档位，不编降雨毫米数。</small></div>
+</section>
+
+<section class="sec grid g2" id="why">
+  <article class="card">
+    <h2>要对上的三件事</h2>
+    <blockquote class="q">关键农事遇霜冻、大风、连阴雨，提醒靠口头，忙起来漏一茬。<cite>第1周假设 · 节点靠口头</cite></blockquote>
+    <blockquote class="q">田里看过一眼，过两天问「哪天风大、哪片地湿」对不上。<cite>第1周假设 · 观测靠印象</cite></blockquote>
+    <blockquote class="q">不想下又一个预报 App，只要关键节点旁能勾、能记的一页表。<cite>第1周假设 · 轻工具</cite></blockquote>
+  </article>
+  <article class="card">
+    <h2>三步上手</h2>
+    <ol class="steps">
+      <li>在天气节点区勾清本周五项（霜冻 / 大风 / 连阴雨 / 经销商催促 / 边界自检）。</li>
+      <li>下地或回屋后补一条简易观测（人话档位，不写预报数字）。</li>
+      <li>愿试填就留 11 位手机；官方预警仍看气象台，不在这页买硬件。</li>
+    </ol>
+    <div class="stats">
+      <div class="stat"><b id="statNode">0</b><span>本机节点条数</span></div>
+      <div class="stat"><b id="statObs">0</b><span>本机观测条数</span></div>
+      <div class="stat"><b id="statBook">0</b><span>本机预约草稿</span></div>
+    </div>
+  </article>
+</section>
+
+<section class="sec card">
+  <h2>怎么用才不算糊弄（示例）</h2>
+  <div class="ex">
+    <div><strong>霜冻节点：</strong>路南玉米幼苗期，预报夜里可能冷——先勾「霜冻风险日已看」，再在观测里写「叶缘略蔫，只观察」。</div>
+    <div><strong>大风节点：</strong>大棚膜抖得厉害——勾「大风风险日」，观测选「比预想更明显」，备注「南侧压膜绳松了」。</div>
+    <div><strong>连阴雨节点：</strong>地头积水未排完——勾「连阴雨风险日」，观测选「大致正常/更明显」，不写毫米数。</div>
+    <div><strong>经销商催促：</strong>有人打电话推销传感器或预报会员——勾「已留意催促」，本页<strong>不代下单</strong>。</div>
+  </div>
+</section>
+
+<section class="sec card" id="node">
+  <h2>关键农事 · 天气风险节点（五项）</h2>
+  <p>五项都看过才能保存。目标：忙季打开就能说清「这周哪类天气风险勾过、地块谁写的」。</p>
+  <div class="bar"><i id="bar"></i></div>
+  <p id="barText" class="hint">已看 0 / 5</p>
+  <form id="nodeForm">
+    <label class="ck"><input type="checkbox" name="c1"/> 霜冻风险日：本周关键农事是否碰到霜冻相关节点（已提醒 / 暂无）</label>
+    <label class="ck"><input type="checkbox" name="c2"/> 大风风险日：本周是否碰到大风相关节点（已提醒 / 暂无）</label>
+    <label class="ck"><input type="checkbox" name="c3"/> 连阴雨风险日：本周是否碰到连阴雨相关节点（已提醒 / 暂无）</label>
+    <label class="ck"><input type="checkbox" name="c4"/> 经销商催促：是否有人推销预报 App / 传感器（已留意 / 无；本页不代购）</label>
+    <label class="ck"><input type="checkbox" name="c5"/> 边界自检：本页不做预报 App、不卖硬件、不承诺降雨量</label>
+    <div class="row2">
+      <label class="field"><span>棚号 / 地块 / 作物</span><input name="plot" required placeholder="例如：路南玉米 / 2号大棚番茄"/></label>
+      <label class="field"><span>填写人</span><input name="who" required placeholder="户主 / 协助记账家属"/></label>
+    </div>
+    <div class="row2">
+      <label class="field"><span>本周最关心的风险</span>
+        <select name="risk" required>
+          <option value="">请选择</option>
+          <option>霜冻</option>
+          <option>大风</option>
+          <option>连阴雨</option>
+          <option>三类都看过</option>
+        </select>
+      </label>
+      <label class="field"><span>关键农事日期</span><input type="date" name="day" required/></label>
+    </div>
+    <label class="field"><span>一句节点备注（可选）</span><textarea name="note" placeholder="例如：已口头提醒家里人看覆膜；暂无霜冻节点。"></textarea></label>
+    <button class="btn btn-p btn-block" type="submit">保存天气节点到本机</button>
+    <p class="msg" id="nodeMsg"></p>
+    <p class="hint">未勾齐五项时会拦截保存；保存后刷新页面，列表里仍能看见棚号和填写人。</p>
+  </form>
+</section>
+
+<section class="sec card" id="obs">
+  <h2>霜冻 / 大风 / 连阴雨 · 简易观测</h2>
+  <p>人话档位，不写预报数值，不替代气象台。建议与上面节点同一棚号/地块。</p>
+  <form id="obsForm">
+    <div class="row2">
+      <label class="field"><span>观测时间</span><input type="datetime-local" name="when" required/></label>
+      <label class="field"><span>棚号 / 地块</span><input name="plot" required placeholder="与节点同一地块"/></label>
+    </div>
+    <div class="row2">
+      <label class="field"><span>风险类型</span>
+        <select name="kind" required>
+          <option value="">请选择</option>
+          <option>霜冻相关</option>
+          <option>大风相关</option>
+          <option>连阴雨相关</option>
+        </select>
+      </label>
+      <label class="field"><span>肉眼情况档位</span>
+        <select name="see" required>
+          <option value="">请选择</option>
+          <option>大致正常</option>
+          <option>比预想更明显（只观察）</option>
+          <option>比预想轻一些（只观察）</option>
+          <option>当时没看清，稍后补</option>
+        </select>
+      </label>
+    </div>
+    <div class="row2">
+      <label class="field"><span>填写人</span><input name="who" placeholder="户主 / 家属"/></label>
+      <label class="field"><span>是否已对照节点勾选</span>
+        <select name="linked">
+          <option>是，刚勾过节点</option>
+          <option>否，先记观测稍后再勾</option>
+        </select>
+      </label>
+    </div>
+    <label class="field"><span>一句备注</span><textarea name="note" placeholder="例如：路南头叶缘发蔫；大棚膜晃得厉害；地里积水未排完。不写毫米数。"></textarea></label>
+    <button class="btn btn-p btn-block" type="submit">保存这条观测</button>
+    <p class="msg" id="obsMsg"></p>
+  </form>
+</section>
+
+<section class="sec card">
+  <h2>本周搭建节奏（对应 HW08）</h2>
+  <ul class="tl">
+    <li><strong>Day1–2</strong>定霜冻/大风/连阴雨 + 经销商催促 + 边界自检五项，与观测档位；标题定为「关键农事看天气，观测留一笔」；绿色主调。</li>
+    <li><strong>Day3–5</strong>上线单页，电脑宽屏与手机窄屏各走通：五项勾选保存、一笔观测、11 位手机号校验。</li>
+    <li><strong>Day6–7</strong>电话试填提纲五问，样本只计种植户主责人或协助记账家属；同学群点赞不计。</li>
+  </ul>
+</section>
+
+<section class="sec card" id="book">
+  <h2>预约两周试填</h2>
+  <p>留下称呼与手机，方便周末电话对接。预约草稿只存本机，不构成付费服务或硬件订购。</p>
+  <form id="bookForm">
+    <div class="row2">
+      <label class="field"><span>怎么称呼</span><input name="name" required placeholder="老张 / 户主"/></label>
+      <label class="field"><span>手机号</span><input name="phone" required inputmode="numeric" maxlength="11" placeholder="11位手机号"/></label>
+    </div>
+    <div class="row2">
+      <label class="field"><span>作物类型（可选）</span>
+        <select name="crop">
+          <option value="">请选择</option>
+          <option>大田粮食</option>
+          <option>露地蔬菜</option>
+          <option>设施大棚</option>
+          <option>果树 / 其他</option>
+        </select>
+      </label>
+      <label class="field"><span>方便接听时段</span>
+        <select name="slot">
+          <option>晚上 19:00–21:00</option>
+          <option>中午休息时段</option>
+          <option>周末白天</option>
+        </select>
+      </label>
+    </div>
+    <label class="field"><span>最想先记清的一件事</span><textarea name="wish" placeholder="例如：霜冻前忘提醒；连阴雨后哪块地湿对不上"></textarea></label>
+    <button class="btn btn-p btn-block" type="submit">留下预约（仅存本机）</button>
+    <p class="msg" id="bookMsg"></p>
+    <p class="hint">试填五问底稿：能否打开 → 是否看懂是节点提醒而非预报 App/卖硬件 → 能否独立勾选 → 愿否两周试填 → 留一句原话。</p>
+    <p style="font-size:12px;color:var(--muted);margin-top:8px">刘润 · 13840348966 · 沈阳农业大学农学院 · 应用气象学</p>
+  </form>
+</section>
+
+<section class="sec card faq">
+  <h2>常见疑问</h2>
+  <details open>
+    <summary>这是不是天气预报软件？</summary>
+    <p>不是。本页只帮你在关键农事旁勾「霜冻/大风/连阴雨风险日」并留观测，官方预警仍看气象台。</p>
+  </details>
+  <details>
+    <summary>数据会上传到服务器吗？</summary>
+    <p>不会。节点、观测、预约都写在本浏览器 localStorage；换设备或清缓存会丢失，重要内容请自行抄纸或截图。</p>
+  </details>
+  <details>
+    <summary>为什么有「经销商催促」这一项？</summary>
+    <p>访谈里常见有人推销传感器或预报会员。勾选只表示「这周留意到催促」，本页不代购、不写推销链接。</p>
+  </details>
+  <details>
+    <summary>同学点赞算不算一次试填？</summary>
+    <p>不算。有效样本只计中小种植户主责人或家里协助农事记账的家属。</p>
+  </details>
+</section>
+
+<section class="sec card" id="hist">
+  <h2>本机最近记录</h2>
+  <div id="list"></div>
+  <div class="cta" style="margin-top:10px">
+    <button class="btn btn-g" type="button" id="clear">清空本机记录</button>
+    <button class="btn btn-g" type="button" id="export">导出本机 JSON</button>
+  </div>
+</section>
+
+<footer>
+  <p>刘润（学号 2024111005）· 农事天气节点提醒·简易观测轻台账 · 路径 B · 非预报 App · 不卖硬件</p>
+  <p>公网：<code>https://hjw-create.github.io/liurun-nongshi-mvp/</code> · 联系电话 13840348966</p>
+  <p>本页用于《AI+OPC创业实践》第5周 MVP 验证：关键农事遇天气风险靠口头、观测事后对不上——用一页日历 + 一页简易观测继续验证。</p>
+</footer>
+</main>
+<script>
+(function(){
+  var KEY='liurun_nongshi_v1';
+  function load(){try{return JSON.parse(localStorage.getItem(KEY)||'[]')}catch(e){return[]}}
+  function save(list){localStorage.setItem(KEY,JSON.stringify(list.slice(0,50)));render()}
+  function stamp(){var d=new Date(),p=function(n){return n<10?'0'+n:''+n};return d.getFullYear()+'-'+p(d.getMonth()+1)+'-'+p(d.getDate())+' '+p(d.getHours())+':'+p(d.getMinutes())}
+  function stats(){
+    var list=load(),n=0,o=0,b=0;
+    list.forEach(function(r){if(r.type==='天气节点')n++;else if(r.type==='简易观测')o++;else if(r.type==='预约试填')b++});
+    document.getElementById('statNode').textContent=n;
+    document.getElementById('statObs').textContent=o;
+    document.getElementById('statBook').textContent=b;
+  }
+  function render(){
+    var list=load(),box=document.getElementById('list');
+    stats();
+    if(!list.length){
+      box.innerHTML="<p style='color:var(--muted);font-size:13px'>还没有记录。先勾天气节点五项，或记一条简易观测。</p>";
+      return;
+    }
+    box.innerHTML=list.map(function(r){
+      return "<div class='item'><b>"+r.type+" · "+r.at+"</b>"+r.summary+"</div>";
+    }).join('');
+  }
+  function bar(){
+    var boxes=document.querySelectorAll('#nodeForm input[type=checkbox]');
+    var n=0;boxes.forEach(function(b){if(b.checked)n++});
+    document.getElementById('bar').style.width=(n/boxes.length*100)+'%';
+    document.getElementById('barText').textContent='已看 '+n+' / '+boxes.length;
+  }
+  document.querySelectorAll('#nodeForm input[type=checkbox]').forEach(function(b){b.addEventListener('change',bar)});
+  bar();
+
+  document.getElementById('nodeForm').onsubmit=function(e){
+    e.preventDefault();
+    var fd=new FormData(e.target);
+    var n=['c1','c2','c3','c4','c5'].filter(function(k){return fd.get(k)}).length;
+    var msg=document.getElementById('nodeMsg');
+    if(n<5){msg.className='msg err';msg.textContent='五项都看过再保存（含经销商催促与边界自检）。';return}
+    var list=load();
+    list.unshift({
+      type:'天气节点',
+      at:stamp(),
+      summary:'风险：'+fd.get('risk')+'；棚号/地块：'+fd.get('plot')+'；日期：'+fd.get('day')+'；填写人：'+fd.get('who')+'；备注：'+((fd.get('note')||'无').toString().trim()||'无')
+    });
+    save(list);
+    msg.className='msg ok';
+    msg.textContent='节点已保存在本机。刷新后仍在。本页不给预报保证。';
+  };
+
+  document.getElementById('obsForm').onsubmit=function(e){
+    e.preventDefault();
+    var fd=new FormData(e.target);
+    var list=load();
+    list.unshift({
+      type:'简易观测',
+      at:stamp(),
+      summary:'时间：'+fd.get('when')+'；地块：'+fd.get('plot')+'；类型：'+fd.get('kind')+'；情况：'+fd.get('see')+'；填写人：'+(fd.get('who')||'未填')+'；对照节点：'+fd.get('linked')+'；备注：'+((fd.get('note')||'无').toString().trim()||'无')
+    });
+    save(list);
+    document.getElementById('obsMsg').className='msg ok';
+    document.getElementById('obsMsg').textContent='观测已保存。官方预警请看气象台。';
+  };
+
+  document.getElementById('bookForm').onsubmit=function(e){
+    e.preventDefault();
+    var fd=new FormData(e.target);
+    var phone=(fd.get('phone')||'').toString().trim();
+    var msg=document.getElementById('bookMsg');
+    if(!/^1[3-9]\d{9}$/.test(phone)){msg.className='msg err';msg.textContent='请填写11位有效手机号。';return}
+    var list=load();
+    list.unshift({
+      type:'预约试填',
+      at:stamp(),
+      summary:'称呼：'+fd.get('name')+'；手机：'+phone+'；作物：'+(fd.get('crop')||'未选')+'；时段：'+fd.get('slot')+'；想记清：'+((fd.get('wish')||'未写').toString().trim()||'未写')
+    });
+    save(list);
+    msg.className='msg ok';
+    msg.textContent='预约草稿已在本机。周末按五问提纲电话对接。';
+    e.target.reset();
+  };
+
+  document.getElementById('clear').onclick=function(){
+    if(!confirm('清空本机全部节点/观测/预约记录？'))return;
+    localStorage.removeItem(KEY);render();
+  };
+  document.getElementById('export').onclick=function(){
+    var blob=new Blob([JSON.stringify(load(),null,2)],{type:'application/json'});
+    var a=document.createElement('a');
+    a.href=URL.createObjectURL(blob);
+    a.download='liurun-nongshi-local.json';
+    a.click();
+    URL.revokeObjectURL(a.href);
+  };
+  render();
+})();
+</script>
+</body>
+</html>
